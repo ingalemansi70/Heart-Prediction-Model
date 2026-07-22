@@ -1,6 +1,5 @@
 import streamlit as st
 import pandas as pd
-import numpy as np
 import joblib
 
 model = joblib.load("heart_model.joblib")
@@ -36,7 +35,7 @@ if st.button("Predict"):
     df = pd.get_dummies(df, columns=["Sex", "ChestPainType", "ExerciseAngina", "ST_Slope"])
 
     numeric_cols = ["Age", "Cholesterol", "RestingBP", "MaxHR", "Oldpeak"]
-    df[numeric_cols] = scaler.transform(df[numeric_cols])
+    df[numeric_cols] = scaler.transform(df[numeric_cols].values)
 
-    pred = model.predict(df)
+    pred = model.predict(df.values)
     st.write("Result:", "Heart Disease" if pred[0]==1 else "No Heart Disease")
