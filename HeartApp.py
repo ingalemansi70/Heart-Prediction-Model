@@ -1,10 +1,10 @@
 import streamlit as st
 import pandas as pd
+import numpy as np
 import joblib
 
 model = joblib.load("heart_model.joblib")
 scaler = joblib.load("heart_scaler.joblib")
-columns = joblib.load("heart_columns.joblib")
 
 st.title("Heart Disease Prediction")
 
@@ -31,14 +31,12 @@ if st.button("Predict"):
         "ST_Slope": stSlope,
         "ChestPainType": chestPainType
     }
-    input_df = pd.DataFrame([sample_data])
+    df = pd.DataFrame([sample_data])
 
-    categorical = ["Sex", "ChestPainType", "ExerciseAngina", "ST_Slope"]
-    input_df = pd.get_dummies(input_df, columns=categorical)
+    df = pd.get_dummies(df, columns=["Sex", "ChestPainType", "ExerciseAngina", "ST_Slope"])
 
-    input_df = input_df.reindex(columns=columns, fill_value=0)
+    numeric_cols = ["Age", "Cholesterol", "RestingBP", "MaxHR", "Oldpeak"]
+    df[numeric_cols] = scaler.transform(df[numeric_cols])
 
-    input_scaled = scaler.transform(input_df.values)
-
-    pred = model.predict(input_scaled)
+    pred = model.predict(df)
     st.write("Result:", "Heart Disease" if pred[0]==1 else "No Heart Disease")
